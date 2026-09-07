@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import html2pdf from 'html2pdf.js';
 import { defaultData } from './data';
 import { ProposalData, Phase, LineItem } from './types';
 import { DocumentPreview } from './DocumentPreview';
@@ -54,10 +55,37 @@ export default function App() {
   });
 
   const [activeTab, setActiveTab] = useState<'studio' | 'client' | 'process' | 'competencies' | 'services' | 'terms'>('studio');
+  const [isGenerating, setIsGenerating] = useState(false);
 
   useEffect(() => {
     localStorage.setItem('proposalBuilderData', JSON.stringify(data));
   }, [data]);
+
+  const handleDownload = () => {
+    setIsGenerating(true);
+    const element = document.getElementById('pdf-document');
+    if (!element) {
+      setIsGenerating(false);
+      return;
+    }
+
+    const opt = {
+      margin: 0,
+      filename: `Oferte_${data.client.projectTitle.replace(/\s+/g, '_')}.pdf`,
+      image: { type: 'jpeg' as const, quality: 0.98 },
+      html2canvas: { scale: 2, useCORS: true, windowWidth: 794 },
+      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' as const },
+      pagebreak: { mode: ['css'], avoid: '.break-inside-avoid' }
+    };
+
+    html2pdf().set(opt).from(element).save().then(() => {
+      setIsGenerating(false);
+    }).catch((err: any) => {
+      console.error(err);
+      setIsGenerating(false);
+      alert('Ndodhi një gabim gjatë gjenerimit të PDF.');
+    });
+  };
 
   const updateCompany = (field: string, value: string) => setData(d => ({ ...d, company: { ...d.company, [field]: value } }));
   const updateClient = (field: string, value: any) => setData(d => ({ ...d, client: { ...d.client, [field]: value } }));
@@ -176,11 +204,12 @@ export default function App() {
       <header className="bg-black text-white px-6 py-4 flex justify-between items-center z-10 shrink-0 print:hidden">
         <div className="font-bold tracking-[0.2em] uppercase text-[11px]">Ofertë Pro</div>
         <button 
-          onClick={() => window.print()} 
-          className="bg-white text-black px-6 py-2 text-[11px] font-bold uppercase tracking-widest hover:bg-gray-200 transition-colors flex items-center gap-2"
+          onClick={handleDownload}
+          disabled={isGenerating} 
+          className="bg-white text-black px-6 py-2 text-[11px] font-bold uppercase tracking-widest hover:bg-gray-200 transition-colors flex items-center gap-2 disabled:opacity-50"
         >
           <Download size={16} />
-          Shkarko PDF
+          {isGenerating ? 'Po gjeneron...' : 'Shkarko PDF'}
         </button>
       </header>
 
