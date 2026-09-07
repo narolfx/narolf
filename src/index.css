@@ -1,0 +1,53 @@
+@import "tailwindcss";
+
+@media print {
+  @page {
+    margin: 20mm;
+    size: A4 portrait;
+  }
+  body {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  .break-after-page {
+    page-break-after: always;
+    break-after: page;
+  }
+  .break-inside-avoid {
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
+}
+
+@theme {
+  --color-white: #ffffff;
+  --color-black: #000000;
+  --color-gray-50: #f9fafb;
+  --color-gray-100: #f3f4f6;
+  --color-gray-200: #e5e7eb;
+  --color-gray-300: #d1d5db;
+  --color-gray-400: #9ca3af;
+  --color-gray-500: #6b7280;
+  --color-gray-600: #4b5563;
+  --color-gray-700: #374151;
+  --color-gray-800: #1f2937;
+  --color-gray-900: #111827;
+  --color-green-600: #16a34a;
+  --color-red-500: #ef4444;
+}
+
+@layer base {
+  body {
+    @apply antialiased;
+    font-family: Arial, Helvetica, sans-serif;
+  }
+}
+
+@layer utilities {
+  .font-serif {
+    font-family: Arial, Helvetica, sans-serif;
+  }
+  .font-sans {
+    font-family: Arial, Helvetica, sans-serif;
+  }
+}

@@ -1,0 +1,6 @@
+{
+  "name": "narolF - Gjenerator Ofertash",
+  "description": "Krijues i profesionalizuar i ofertave dhe gjenerator i tyre ne PDF. Mundeson menaxhim dhe dizajnim te personalizueshëm në gjuhën Shqipe.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
