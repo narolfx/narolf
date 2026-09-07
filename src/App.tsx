@@ -55,6 +55,7 @@ export default function App() {
   });
 
   const [activeTab, setActiveTab] = useState<'studio' | 'client' | 'process' | 'competencies' | 'services' | 'terms'>('studio');
+  const [mobileView, setMobileView] = useState<'editor' | 'preview'>('editor');
   const [isGenerating, setIsGenerating] = useState(false);
 
   useEffect(() => {
@@ -201,32 +202,50 @@ export default function App() {
   return (
     <div className="flex flex-col h-screen bg-gray-50 font-sans text-gray-800 overflow-hidden print:h-auto print:overflow-visible">
       {/* Header */}
-      <header className="bg-black text-white px-6 py-4 flex justify-between items-center z-10 shrink-0 print:hidden">
+      <header className="bg-black text-white px-4 md:px-6 py-4 flex justify-between items-center z-10 shrink-0 print:hidden flex-wrap gap-4">
         <div className="font-bold tracking-[0.2em] uppercase text-[11px]">Ofertë Pro</div>
+        
+        {/* Mobile View Toggle */}
+        <div className="flex bg-gray-800 rounded-md p-1 lg:hidden">
+          <button
+            onClick={() => setMobileView('editor')}
+            className={`px-4 py-1 text-[10px] font-bold uppercase tracking-wider rounded-sm transition-colors ${mobileView === 'editor' ? 'bg-white text-black' : 'text-gray-400'}`}
+          >
+            Edituesi
+          </button>
+          <button
+            onClick={() => setMobileView('preview')}
+            className={`px-4 py-1 text-[10px] font-bold uppercase tracking-wider rounded-sm transition-colors ${mobileView === 'preview' ? 'bg-white text-black' : 'text-gray-400'}`}
+          >
+            Parapamja
+          </button>
+        </div>
+
         <button 
           onClick={handleDownload}
           disabled={isGenerating} 
-          className="bg-white text-black px-6 py-2 text-[11px] font-bold uppercase tracking-widest hover:bg-gray-200 transition-colors flex items-center gap-2 disabled:opacity-50"
+          className="bg-white text-black px-4 md:px-6 py-2 text-[10px] md:text-[11px] font-bold uppercase tracking-widest hover:bg-gray-200 transition-colors flex items-center gap-2 disabled:opacity-50"
         >
           <Download size={16} />
-          {isGenerating ? 'Po gjeneron...' : 'Shkarko PDF'}
+          <span className="hidden sm:inline">{isGenerating ? 'Po gjeneron...' : 'Shkarko PDF'}</span>
+          <span className="sm:hidden">{isGenerating ? '...' : 'PDF'}</span>
         </button>
       </header>
 
       {/* Main Layout */}
-      <div className="flex flex-1 overflow-hidden print:overflow-visible">
+      <div className="flex flex-1 overflow-hidden print:overflow-visible relative">
         
         {/* Editor Pane */}
-        <div className="w-[450px] shrink-0 h-full overflow-y-auto bg-white border-r border-gray-200 flex flex-col print:hidden">
+        <div className={`w-full lg:w-[450px] shrink-0 h-full overflow-y-auto bg-white border-r border-gray-200 flex-col print:hidden ${mobileView === 'preview' ? 'hidden lg:flex' : 'flex'}`}>
           {/* Tabs */}
-          <div className="flex border-b border-gray-100 shrink-0">
+          <div className="flex overflow-x-auto border-b border-gray-100 shrink-0 scrollbar-hide">
             {tabs.map(tab => {
               const Icon = tab.icon;
               return (
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id as any)}
-                  className={`flex-1 py-4 flex flex-col items-center justify-center gap-2 border-b-2 transition-colors ${
+                  className={`flex-1 min-w-[80px] py-4 flex flex-col items-center justify-center gap-2 border-b-2 transition-colors ${
                     activeTab === tab.id ? 'border-black text-black' : 'border-transparent text-gray-400 hover:bg-gray-50'
                   }`}
                 >
@@ -274,8 +293,8 @@ export default function App() {
                     <button onClick={() => deleteProcess(proc.id)} className="absolute top-4 right-4 text-gray-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity">
                       <Trash2 size={16} />
                     </button>
-                    <div className="flex gap-4 mb-4 pr-8">
-                      <div className="w-16">
+                    <div className="flex flex-col sm:flex-row gap-4 mb-4 sm:pr-8 pr-6">
+                      <div className="w-full sm:w-16">
                         <TextInput label="Numri" value={proc.number} onChange={(v: string) => updateProcess(proc.id, 'number', v)} />
                       </div>
                       <div className="flex-1">
@@ -358,8 +377,8 @@ export default function App() {
                     <div className="mt-8">
                       <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-4 border-b border-gray-200 pb-2">Zërat e Faturimit</label>
                       {phase.items.map((item, iIndex) => (
-                        <div key={item.id} className="grid grid-cols-12 gap-3 mb-4 items-center bg-white p-4 border border-gray-100 shadow-sm">
-                          <div className="col-span-12">
+                        <div key={item.id} className="grid grid-cols-12 gap-x-3 gap-y-4 mb-4 items-center bg-white p-4 border border-gray-100 shadow-sm relative">
+                          <div className="col-span-12 pr-6">
                             <input 
                               placeholder="Përshkrimi i zërit" 
                               value={item.description} 
@@ -367,7 +386,7 @@ export default function App() {
                               className="w-full border-b border-gray-200 py-1 text-sm focus:outline-none focus:border-black"
                             />
                           </div>
-                          <div className="col-span-3">
+                          <div className="col-span-4">
                             <label className="text-[9px] text-gray-400 uppercase tracking-wider block mb-1">Sasia</label>
                             <input 
                               type="number"
@@ -393,7 +412,7 @@ export default function App() {
                               className="w-full border-b border-gray-200 py-1 text-sm focus:outline-none focus:border-black"
                             />
                           </div>
-                          <div className="col-span-1 flex justify-end pt-5">
+                          <div className="absolute top-4 right-4 flex justify-end">
                             <button onClick={() => deleteItem(phase.id, item.id)} className="text-gray-300 hover:text-red-500">
                               <Trash2 size={14} />
                             </button>
@@ -431,11 +450,11 @@ export default function App() {
         </div>
 
         {/* Preview Pane */}
-        <div className="flex-1 bg-gray-100 overflow-y-auto flex justify-center py-12 relative print:bg-white print:p-0 print:overflow-visible print:block">
-          <div className="absolute top-4 right-6 text-xs text-gray-400 font-bold tracking-widest uppercase print:hidden">
+        <div className={`flex-1 bg-gray-100 overflow-y-auto flex justify-center py-4 lg:py-12 relative print:bg-white print:p-0 print:overflow-visible print:block ${mobileView === 'editor' ? 'hidden lg:flex' : 'flex'}`}>
+          <div className="absolute top-4 right-6 text-xs text-gray-400 font-bold tracking-widest uppercase hidden lg:block print:hidden">
             Parapamja Live
           </div>
-          <div className="transform origin-top scale-[0.7] xl:scale-[0.8] 2xl:scale-[0.9] transition-transform pb-[200px] print:transform-none print:pb-0 print:w-full print:flex print:justify-center">
+          <div className="transform origin-top scale-[0.45] sm:scale-[0.6] md:scale-[0.7] lg:scale-[0.8] 2xl:scale-[0.9] transition-transform pb-[200px] print:transform-none print:pb-0 print:w-full print:flex print:justify-center">
             <DocumentPreview data={data} id="pdf-document" />
           </div>
         </div>
